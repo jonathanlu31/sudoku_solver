@@ -1,3 +1,4 @@
+import sys
 import pygame as pg
 import sudoku
 
@@ -8,17 +9,19 @@ enterFont = pg.font.Font('Raleway-VariableFont_wght.ttf', 30)
 
 class Box():
     def __init__(self, rect, value):
-        self.rect = rect
+        self.rect = pg.Rect(rect)
         self.value = value
         self.pencil = 0
+        self.highlighted = False
 
     def draw(self):
         pg.draw.rect(win, (0, 0, 0), self.rect, 1)
+        if self.highlighted:
+            pg.draw.rect(win, (187, 222, 251), (self.rect.x + 1, self.rect.y + 1, 48, 48))
         if self.value != 0:
             number_surface = enterFont.render(str(self.value), True, (0, 0, 0))
-            number_rect = number_surface.get_rect(center=(self.rect[0] + self.rect[2] // 2, self.rect[1] + self.rect[3] // 2))
+            number_rect = number_surface.get_rect(center=(self.rect.centerx, self.rect.centery))
             win.blit(number_surface, number_rect)
-
 
 def makeGrid(grid):
     formatted_grid = []
@@ -34,11 +37,19 @@ def screenUpdate(grid):
     pg.display.update()
 
 run = True
+grid = makeGrid(sudoku.board)
 while run:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             run = False
+        if event.type == pg.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                for box in grid:
+                    box.highlighted = False
+                    if box.rect.collidepoint(event.pos):
+                        box.highlighted = True
 
-    screenUpdate(makeGrid(sudoku.board))
+    screenUpdate(grid)
 
 pg.quit()
+sys.exit()
