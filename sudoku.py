@@ -13,20 +13,18 @@ board = [
 def solve(bd):
     empty = find_empty(bd)
     if not empty:
-        return bd
+        return True
 
     for i in range(1, 10):
-        y, x = empty
-        bd[y][x] = i
-
         if valid(bd, i, empty):
-            solved = solve(bd)
-            if solved:
-                return solved
-        
-        bd[y][x] = 0
+            y, x = empty
+            bd[y][x] = i
+            if solve(bd):
+                return True
 
-    return None    
+            bd[y][x] = 0
+
+    return False
 
 def valid(bd, num, pos):
     y, x = pos
