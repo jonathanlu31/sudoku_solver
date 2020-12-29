@@ -5,7 +5,7 @@ import sudoku
 pg.init()
 win = pg.display.set_mode((450, 500))
 pg.display.set_caption('Sudoku Solver')
-enterFont = pg.font.Font('Raleway-VariableFont_wght.ttf', 30)
+enterFont = pg.font.Font('SourceSansPro-Regular.ttf', 30)
 
 class Box():
     def __init__(self, rect, value):
