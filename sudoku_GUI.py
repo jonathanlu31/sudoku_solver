@@ -77,7 +77,7 @@ class Grid():
                 self.update_formatted(i, empty)
                 self.formatted[y][x].correct = True
                 screenUpdate()
-                pg.time.delay(50)
+                # pg.time.delay(50)
                 
                 if self.solve_GUI():
                     self.formatted[y][x].wrong = False
@@ -102,15 +102,28 @@ def drawTimer():
 
 def screenUpdate():
     win.fill((255, 255, 255))
-    for row in board.formatted:
+    for row in play_board.formatted:
         for box in row:
             box.draw()
-    board.draw()
+    play_board.draw()
     drawTimer()
     pg.display.update()
 
+if len(sys.argv) > 1:
+    difficulty = sys.argv[1]
+    if difficulty == 'medium':
+        board = sudoku.board2
+    elif difficulty == 'hard':
+        board = sudoku.board3
+    elif difficulty == 'expert':
+        board = sudoku.board4
+    else:
+        board = sudoku.board1
+else:
+    board = sudoku.board1
+
 run = True
-board = Grid(sudoku.board1)
+play_board = Grid(board)
 pencil_mode = False
 selected = None
 
@@ -120,7 +133,7 @@ while run:
             run = False
         if event.type == pg.MOUSEBUTTONDOWN:
             if event.button == 1:
-                for row in board.formatted:
+                for row in play_board.formatted:
                     for box in row:
                         box.highlighted = False
                         if box.rect.collidepoint(event.pos):
@@ -129,7 +142,7 @@ while run:
 
     keys = pg.key.get_pressed()
     if keys[pg.K_SPACE]:
-        board.solve_GUI()
+        play_board.solve_GUI()
     nums = [keys[pg.K_1], keys[pg.K_2], keys[pg.K_3], keys[pg.K_4], keys[pg.K_5], keys[pg.K_6], keys[pg.K_7], keys[pg.K_8], keys[pg.K_9]]
     if selected and not selected.fixed:
         if any(nums):
@@ -138,8 +151,8 @@ while run:
             selected.value = selected.pencil
             selected.pencil = 0
             y, x = selected.pos
-            board.player_grid[y][x] = selected.value
-            if not sudoku.valid(board.player_grid, selected.value, selected.pos):
+            play_board.player_grid[y][x] = selected.value
+            if not sudoku.valid(play_board.player_grid, selected.value, selected.pos):
                 selected.wrong = True
             else:
                 selected.wrong = False
