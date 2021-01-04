@@ -9,6 +9,7 @@ pg.display.set_caption('Sudoku Solver')
 enterFont = pg.font.Font('SourceSansPro-Regular.ttf', 30)
 pencilFont = pg.font.Font('SourceSansPro-Regular.ttf', 15)
 
+
 class Box():
     def __init__(self, rect, value, pos, fixed):
         self.rect = pg.Rect(rect)
@@ -35,6 +36,7 @@ class Box():
             pencil_surface = pencilFont.render(str(self.pencil), True, (0, 0, 0, 0.7))
             pencil_rect = pencil_surface.get_rect(topleft=(self.rect.x + 7, self.rect.y + 3))
             win.blit(pencil_surface, pencil_rect)
+
 
 class Grid():
     def __init__(self, grid):
@@ -65,7 +67,7 @@ class Grid():
         y, x = pos
         self.formatted[y][x].value = val
 
-    def solve_GUI(self):
+    def solve_gui(self):
         empty = sudoku.find_empty(self.grid)
         if not empty:
             return True
@@ -76,10 +78,10 @@ class Grid():
                 self.grid[y][x] = i
                 self.update_formatted(i, empty)
                 self.formatted[y][x].correct = True
-                screenUpdate()
+                screen_update()
                 # pg.time.delay(50)
                 
-                if self.solve_GUI():
+                if self.solve_gui():
                     self.formatted[y][x].wrong = False
                     self.formatted[y][x].correct = False
                     pg.time.delay(10)
@@ -89,25 +91,28 @@ class Grid():
                 self.update_formatted(0, empty)
                 self.formatted[y][x].wrong = True
                 self.formatted[y][x].correct = False
-                screenUpdate()
+                screen_update()
 
         return False
 
-def drawTimer():
+
+def draw_timer():
     sec = pg.time.get_ticks() // 1000
     minutes = (sec // 60 if sec >= 60 else 0)
     time_surface = enterFont.render(f'{minutes:02}:{sec - minutes * 60:02}', True, (0, 0, 0))
     time_rect = time_surface.get_rect(topleft=(360, 455))
     win.blit(time_surface, time_rect)
 
-def screenUpdate():
+
+def screen_update():
     win.fill((255, 255, 255))
     for row in play_board.formatted:
         for box in row:
             box.draw()
     play_board.draw()
-    drawTimer()
+    draw_timer()
     pg.display.update()
+
 
 if len(sys.argv) > 1:
     difficulty = sys.argv[1]
@@ -142,8 +147,10 @@ while run:
 
     keys = pg.key.get_pressed()
     if keys[pg.K_SPACE]:
-        play_board.solve_GUI()
-    nums = [keys[pg.K_1], keys[pg.K_2], keys[pg.K_3], keys[pg.K_4], keys[pg.K_5], keys[pg.K_6], keys[pg.K_7], keys[pg.K_8], keys[pg.K_9]]
+        play_board.solve_gui()
+    nums = [keys[pg.K_1], keys[pg.K_2], keys[pg.K_3],
+            keys[pg.K_4], keys[pg.K_5], keys[pg.K_6],
+            keys[pg.K_7], keys[pg.K_8], keys[pg.K_9]]
     if selected and not selected.fixed:
         if any(nums):
             selected.pencil = nums.index(True) + 1
@@ -164,8 +171,8 @@ while run:
                 selected.pencil = 0
             else:
                 selected.value = 0
-    
-    screenUpdate()
+
+    screen_update()
 
 pg.quit()
 sys.exit()

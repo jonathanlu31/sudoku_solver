@@ -69,7 +69,7 @@ def valid(bd, num, pos):
     for i in range(len(bd[y])):
         if bd[y][i] == num and i != x:
             return False
-    
+
     # Check column
     for i in range(len(bd)):
         if bd[i][x] == num and i != y:
@@ -81,7 +81,7 @@ def valid(bd, num, pos):
         for j in range(box_x * 3, box_x * 3 + 3):
             if bd[i][j] == num and i != y and j != x:
                 return False
-    
+
     return True
 
 def print_board(bd):
