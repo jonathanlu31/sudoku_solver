@@ -1,33 +1,26 @@
 # Sudoku Solver
 
-*this text is italics*\
-__this one__ is bold
+This is a sudoku solver built in Python using the backtracking algorithm. It features a playable GUI with multiple boards of varying difficulty. 
 
-~~this text is struckthrough~~
-___
-## That one was a separator
----
->This one is a quote
+## Instructions
 
-[My personal website](https://www.jonathanlu31@github.io "This has a title")
+To play the game, run sudoku_GUI.py with a second argument describing the intended difficulty (easy, medium, hard, expert):
 
-* item 1
-* item 2
-  * nested
-
-1. start
-   1. end
-
-- [x] is this checked
-- [ ] nope
-
-```python
-def myfunc(key=None):
-    print("Too bad highlighting isn't very substantial")
+```bash
+python3 sudoku_GUI.py easy
 ```
-![placeholder logo](../flappy/assets/bluebird-midflap.png)
+
+Click on a box to select it and press any number key to write a number in pencil mode. Press ENTER if you wish to input your pencil value as an actual value. If the value is invalid, the box will have a red outline. To remove an actual value, press BACKSPACE. To remove a pencil value, press P to switch to pencil mode and press BACKSPACE. Press P again to revert. If you would like the autosolver to solve the board, press SPACE and watch it go at it. 
+
+</br>
+<p align='center'>
+  <img src='https://media.giphy.com/media/lnS6A5WJSfjygIFd2a/giphy.gif'/>
+</p>
+</br>
+
+(Tip: the hard and expert boards take around 4 minutes for the autosolver to solve, but you can force quit to leave early)
 
 
-| Name | Email|
-| -----|------|
-|bad | bob|
+## Acknowledgments
+
+* [techwithtim](https://github.com/techwithtim)
