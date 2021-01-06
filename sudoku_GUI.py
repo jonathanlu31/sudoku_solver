@@ -79,7 +79,6 @@ class Grid():
                 self.update_formatted(i, empty)
                 self.formatted[y][x].correct = True
                 screen_update()
-                # pg.time.delay(50)
                 
                 if self.solve_gui():
                     self.formatted[y][x].wrong = False
