@@ -1,3 +1,17 @@
+"""Sudoku GUI
+
+This script runs a sudoku gui game with an automatic solver based on the backtracking
+algorithm. Accepts command line arguments for difficulty (easy, medium, hard, expert)
+
+Classes:
+    Box(): A class to keep track of the details of each sudoku box.
+    Grid(): Keeps track of the format and state of the overall board/layout
+
+Functions:
+    draw_timer(): Draws the stopwatch timer at the bottom right of the screen.
+    screen_update(): Updates the screen
+"""
+
 import sys
 import copy
 import pygame as pg
@@ -11,7 +25,33 @@ pencilFont = pg.font.Font('SourceSansPro-Regular.ttf', 15)
 
 
 class Box():
+    """A class used to represent individual sudoku boxes.
+
+    Keeps track of the state for each sudoku box.
+    """
+
     def __init__(self, rect, value, pos, fixed):
+        """Inits Box with passed in values.
+
+        Args:
+            rect (tuple): A tuple in this format: (x, y, width, height)
+            value (int): An integer describing the actual value of the box.
+            pos (tuple): A tuple describing the position of the box within
+                the unformatted grid (y, x) - used for the sudoku module
+                functions
+            fixed (bool): A flag used to check if the value is part of the
+                original board and thus shouldn't be mutable by the user
+
+        Attributes:
+            pencil (int): Keeps track of what value the user has penciled in
+                for the box
+            highlighted (bool): A flag to determine whether the box is selected
+            correct (bool): A flag to outline the box green for correct in
+                the autosolver
+            wrong (bool): A flag to outline the box red because the value
+                is invalid
+        """
+
         self.rect = pg.Rect(rect)
         self.value = value
         self.pencil = 0
@@ -22,6 +62,7 @@ class Box():
         self.fixed = fixed
 
     def draw(self):
+        """Draws the box pencil value, actual value, and highlights"""
         if self.highlighted:
             pg.draw.rect(win, (187, 222, 251), (self.rect.x + 1, self.rect.y + 1, 49, 49))
         if self.correct:
@@ -39,12 +80,32 @@ class Box():
 
 
 class Grid():
+    """Keeps track of the overall grid including drawing and solving the board"""
     def __init__(self, grid):
+        """Inits a grid for the game.
+
+        Args:
+            grid (2D-list): This is a list of lists describing the inital
+                sudoku board and is used in the autosolver. It is imported
+                from the sudoku module
+
+        Attributes:
+            player_grid (2D-list): A copy of the original grid. This grid is
+                used to keep track of the player's inputs.
+            formatted (2D-list): A list of lists containing Box objects to
+                represent the individual sudoku squares
+        """
+
         self.grid = grid
         self.player_grid = copy.deepcopy(grid)
         self.formatted = self.format()
 
     def draw(self):
+        """Draws the grid layout for the board.
+
+        It accentuates every third line to create the big boxes
+        """
+
         for i in range(10):
             if i % 3 == 0:
                 pg.draw.rect(win, (0, 0, 0), (i * 50 - 1.5, 0, 3, 450))
@@ -54,6 +115,13 @@ class Grid():
                 pg.draw.rect(win, (0, 0, 0), (0, i * 50, 450, 1))
 
     def format(self):
+        """Creates a list of lists containing Box objects
+
+        Returns:
+            2D-list: Box objects are represented in the 2D-list to match the
+            unformatted values in the original grid
+        """
+
         formatted = [[] for __ in range(len(self.grid))]
         for y, row in enumerate(self.grid):
             for x, val in enumerate(row):
