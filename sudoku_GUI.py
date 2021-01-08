@@ -1,7 +1,8 @@
 """Sudoku GUI
 
-This script runs a sudoku gui game with an automatic solver based on the backtracking
-algorithm. Accepts command line arguments for difficulty (easy, medium, hard, expert)
+This script runs a sudoku gui game with an automatic solver based on the
+backtracking algorithm. Accepts command line arguments for difficulty (easy,
+medium, hard, expert)
 
 Classes:
     Box(): A class to keep track of the details of each sudoku box.
@@ -119,7 +120,7 @@ class Grid():
 
         Returns:
             2D-list: Box objects are represented in the 2D-list to match the
-            unformatted values in the original grid
+                unformatted values in the original grid
         """
 
         formatted = [[] for __ in range(len(self.grid))]
@@ -132,10 +133,30 @@ class Grid():
         return formatted
 
     def update_formatted(self, val, pos):
+        """Updates the value attribute of the Box object described by pos
+
+        Args:
+            val (int): The number inputted for the selected sudoku box
+            pos (tuple): Describes the y, x position of the Box object
+                in the formatted grid 2D-list
+        """
+
         y, x = pos
         self.formatted[y][x].value = val
 
     def solve_gui(self):
+        """Solves the board while displaying the process.
+
+        This function is based on the solver in the sudoku module. It uses the
+        backtracking algorithm and updates both the unformatted and formatted
+        grid. The unformatted is used for the solver functions, while the
+        formatted grid is used to display the numbers and highlights.
+
+        Returns:
+            bool: a boolean that describes whether the board is solvable.
+                It is fed back into the function in a recursive manner
+        """
+
         empty = sudoku.find_empty(self.grid)
         if not empty:
             return True
@@ -147,13 +168,13 @@ class Grid():
                 self.update_formatted(i, empty)
                 self.formatted[y][x].correct = True
                 screen_update()
-                
+
                 if self.solve_gui():
                     self.formatted[y][x].wrong = False
                     self.formatted[y][x].correct = False
                     pg.time.delay(10)
                     return True
-            
+
                 self.grid[y][x] = 0
                 self.update_formatted(0, empty)
                 self.formatted[y][x].wrong = True
@@ -164,6 +185,7 @@ class Grid():
 
 
 def draw_timer():
+    """Draws the stopwatch timer on the bottom right of the screen"""
     sec = pg.time.get_ticks() // 1000
     minutes = (sec // 60 if sec >= 60 else 0)
     time_surface = enterFont.render(f'{minutes:02}:{sec - minutes * 60:02}', True, (0, 0, 0))
@@ -172,6 +194,11 @@ def draw_timer():
 
 
 def screen_update():
+    """Updates the screen
+
+    Calls the draw function of each object and the timer
+    """
+
     win.fill((255, 255, 255))
     for row in play_board.formatted:
         for box in row:
