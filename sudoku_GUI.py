@@ -25,7 +25,7 @@ enterFont = pg.font.Font('SourceSansPro-Regular.ttf', 30)
 pencilFont = pg.font.Font('SourceSansPro-Regular.ttf', 15)
 
 
-class Box():
+class Box:
     """A class used to represent individual sudoku boxes.
 
     Keeps track of the state for each sudoku box.
@@ -80,7 +80,7 @@ class Box():
             win.blit(pencil_surface, pencil_rect)
 
 
-class Grid():
+class Grid:
     """Keeps track of the overall grid including drawing and solving the board"""
     def __init__(self, grid):
         """Inits a grid for the game.
@@ -144,6 +144,10 @@ class Grid():
         y, x = pos
         self.formatted[y][x].value = val
 
+    def solved(self):
+        if self.player_grid == solution:
+            return True
+
     def solve_gui(self):
         """Solves the board while displaying the process.
 
@@ -186,11 +190,13 @@ class Grid():
 
 def draw_timer():
     """Draws the stopwatch timer on the bottom right of the screen"""
+    global time
     sec = pg.time.get_ticks() // 1000
     minutes = (sec // 60 if sec >= 60 else 0)
-    time_surface = enterFont.render(f'{minutes:02}:{sec - minutes * 60:02}', True, (0, 0, 0))
-    time_rect = time_surface.get_rect(topleft=(360, 455))
-    win.blit(time_surface, time_rect)
+    time = f'{minutes:02}:{sec - minutes * 60:02}'
+    timer_surface = enterFont.render(time, True, (0, 0, 0))
+    timer_rect = timer_surface.get_rect(topleft=(360, 455))
+    win.blit(timer_surface, timer_rect)
 
 
 def screen_update():
@@ -204,33 +210,56 @@ def screen_update():
         for box in row:
             box.draw()
     play_board.draw()
-    draw_timer()
+    if completed:
+        player_victory()
+    else:
+        draw_timer()
     pg.display.update()
+
+
+def player_victory():
+    overlay = pg.Surface((450, 500))
+    overlay.fill((0, 0, 0))
+    overlay.set_alpha(168)
+    win.blit(overlay, (0, 0))
+    victory_surface = enterFont.render('You win!!', False, (255, 255, 255))
+    victory_rect = victory_surface.get_rect(center=(225, 210))
+    time_surface = enterFont.render(time, False, (255, 255, 255))
+    time_rect = time_surface.get_rect(center=(225, 260))
+    win.blit(victory_surface, victory_rect)
+    win.blit(time_surface, time_rect)
 
 
 if len(sys.argv) > 1:
     difficulty = sys.argv[1]
     if difficulty == 'medium':
         board = sudoku.board2
+        solution = sudoku.board2_key
     elif difficulty == 'hard':
         board = sudoku.board3
+        solution = sudoku.board3_key
     elif difficulty == 'expert':
         board = sudoku.board4
+        solution = sudoku.board4_key
     else:
         board = sudoku.board1
+        solution = sudoku.board1_key
 else:
     board = sudoku.board1
+    solution = sudoku.board1_key
 
 run = True
 play_board = Grid(board)
+time = None
 pencil_mode = False
+completed = False
 selected = None
 
 while run:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             run = False
-        if event.type == pg.MOUSEBUTTONDOWN:
+        if event.type == pg.MOUSEBUTTONDOWN and not completed:
             if event.button == 1:
                 for row in play_board.formatted:
                     for box in row:
@@ -238,33 +267,35 @@ while run:
                         if box.rect.collidepoint(event.pos):
                             box.highlighted = True
                             selected = box
-
-    keys = pg.key.get_pressed()
-    if keys[pg.K_SPACE]:
-        play_board.solve_gui()
-    nums = [keys[pg.K_1], keys[pg.K_2], keys[pg.K_3],
-            keys[pg.K_4], keys[pg.K_5], keys[pg.K_6],
-            keys[pg.K_7], keys[pg.K_8], keys[pg.K_9]]
-    if selected and not selected.fixed:
-        if any(nums):
-            selected.pencil = nums.index(True) + 1
-        if keys[pg.K_RETURN] and selected.pencil:
-            selected.value = selected.pencil
-            selected.pencil = 0
-            y, x = selected.pos
-            play_board.player_grid[y][x] = selected.value
-            if not sudoku.valid(play_board.player_grid, selected.value, selected.pos):
-                selected.wrong = True
-            else:
-                selected.wrong = False
-
-        if keys[pg.K_p]:
-            pencil_mode = not pencil_mode
-        if keys[pg.K_BACKSPACE]:
-            if pencil_mode:
+    if not completed:
+        keys = pg.key.get_pressed()
+        if keys[pg.K_SPACE]:
+            play_board.solve_gui()
+        nums = [keys[pg.K_1], keys[pg.K_2], keys[pg.K_3],
+                keys[pg.K_4], keys[pg.K_5], keys[pg.K_6],
+                keys[pg.K_7], keys[pg.K_8], keys[pg.K_9]]
+        if selected and not selected.fixed:
+            if any(nums):
+                selected.pencil = nums.index(True) + 1
+            if keys[pg.K_RETURN] and selected.pencil:
+                selected.value = selected.pencil
                 selected.pencil = 0
-            else:
-                selected.value = 0
+                y, x = selected.pos
+                play_board.player_grid[y][x] = selected.value
+                if play_board.solved():
+                    completed = True
+                if not sudoku.valid(play_board.player_grid, selected.value, selected.pos):
+                    selected.wrong = True
+                else:
+                    selected.wrong = False
+
+            if keys[pg.K_p]:
+                pencil_mode = not pencil_mode
+            if keys[pg.K_BACKSPACE]:
+                if pencil_mode:
+                    selected.pencil = 0
+                else:
+                    selected.value = 0
 
     screen_update()
 
